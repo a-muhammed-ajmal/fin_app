@@ -298,7 +298,7 @@ const FinancialPlan = () => {
                         <h3 className="font-bold text-slate-800 text-lg">Mandatory Goals (Needs)</h3>
                         {freedomGoals.length === 0 && (
                             <div className="text-slate-400 p-8 border-2 border-dashed rounded-xl text-center">
-                                No "Freedom" goals set. Go to Investing Tab > Add Goal (Tier: Freedom).
+                                No "Freedom" goals set. Go to Investing Tab {`>`} Add Goal (Tier: Freedom).
                             </div>
                         )}
                         {freedomGoals.map(g => (
