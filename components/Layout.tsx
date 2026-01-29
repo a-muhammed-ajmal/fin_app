@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, CheckSquare, Calendar, Wallet, Users, Mountain, Menu, X, Bot } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Calendar, Wallet, Users, Mountain, Menu, X, Bot, Settings } from 'lucide-react';
 import Dashboard from './Dashboard';
 import TaskManager from './TaskManager';
 import HabitTracker from './HabitTracker';
@@ -7,6 +7,7 @@ import FinanceManager from './FinanceManager';
 import CRM from './CRM';
 import VisionBoard from './VisionBoard';
 import AIAssistant from './AIAssistant';
+import DataManager from './DataManager';
 
 const Layout = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -20,6 +21,7 @@ const Layout = () => {
     { id: 'crm', label: 'CRM', icon: Users },
     { id: 'vision', label: 'Vision', icon: Mountain },
     { id: 'ai', label: 'AI Assistant', icon: Bot },
+    { id: 'data', label: 'Data Manager', icon: Settings },
   ];
 
   const renderContent = () => {
@@ -31,6 +33,7 @@ const Layout = () => {
       case 'crm': return <CRM />;
       case 'vision': return <VisionBoard />;
       case 'ai': return <AIAssistant />;
+      case 'data': return <DataManager />;
       default: return <Dashboard />;
     }
   };
