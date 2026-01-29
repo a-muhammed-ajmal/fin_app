@@ -7,6 +7,7 @@ import {
   LoanPurpose, LoanCollateral, LoanStructure, InterestCalculation, InterestRateType, LoanType, InsuranceType,
   Investment, AssetClass, RiskProfile, TaxProfile, TaxRegime
 } from '../types';
+import { useSupabaseSyncWithLocalStorage } from '../services/useSupabaseSync';
 
 interface DataContextType extends AppData {
   addTask: (task: Omit<Task, 'id'>) => void;
@@ -210,53 +211,62 @@ const INITIAL_DATA: AppData = {
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<AppData>(INITIAL_DATA);
   const [loaded, setLoaded] = useState(false);
+  const { loadFromSupabase, syncToSupabase } = useSupabaseSyncWithLocalStorage(data, setData);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const mergedData = { ...INITIAL_DATA, ...parsed };
-        
-        // Fix for investments (ensure monthlySIPAmount exists)
-        if (mergedData.investments) {
-            mergedData.investments = mergedData.investments.map((i: any) => ({
-                ...i,
-                monthlySIPAmount: i.monthlySIPAmount || 0
-            }));
-        }
-
-        // Fix for goals (ensure new financial fields exist)
-        if (mergedData.goals) {
-            mergedData.goals = mergedData.goals.map((g: any) => ({
-                ...g,
-                isFinancial: g.isFinancial !== undefined ? g.isFinancial : false,
-                currentCost: g.currentCost || 0,
-                yearsAway: g.yearsAway || 1,
-                inflationRate: g.inflationRate || 6,
-                futureValue: g.futureValue || 0,
-                requiredSIP: g.requiredSIP || 0,
-                tier: g.tier || 'Freedom' // Default to Freedom/Must-Have
-            }));
-        }
-
-        if(!mergedData.taxProfile) {
-            mergedData.taxProfile = INITIAL_DATA.taxProfile;
-        }
-
-        setData(mergedData);
-      } catch (e) {
-        console.error("Failed to load data", e);
+    // Try to load from Supabase first, then fallback to localStorage
+    const loadData = async () => {
+      const supabaseData = await loadFromSupabase();
+      
+      if (supabaseData) {
+        setData(supabaseData);
+        setLoaded(true);
+        return;
       }
-    }
-    setLoaded(true);
-  }, []);
 
-  useEffect(() => {
-    if (loaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-  }, [data, loaded]);
+      // Fallback to localStorage
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const mergedData = { ...INITIAL_DATA, ...parsed };
+          
+          // Fix for investments (ensure monthlySIPAmount exists)
+          if (mergedData.investments) {
+              mergedData.investments = mergedData.investments.map((i: any) => ({
+                  ...i,
+                  monthlySIPAmount: i.monthlySIPAmount || 0
+              }));
+          }
+
+          // Fix for goals (ensure new financial fields exist)
+          if (mergedData.goals) {
+              mergedData.goals = mergedData.goals.map((g: any) => ({
+                  ...g,
+                  isFinancial: g.isFinancial !== undefined ? g.isFinancial : false,
+                  currentCost: g.currentCost || 0,
+                  yearsAway: g.yearsAway || 1,
+                  inflationRate: g.inflationRate || 6,
+                  futureValue: g.futureValue || 0,
+                  requiredSIP: g.requiredSIP || 0,
+                  tier: g.tier || 'Freedom' // Default to Freedom/Must-Have
+              }));
+          }
+
+          if(!mergedData.taxProfile) {
+              mergedData.taxProfile = INITIAL_DATA.taxProfile;
+          }
+
+          setData(mergedData);
+        } catch (e) {
+          console.error("Failed to load data", e);
+        }
+      }
+      setLoaded(true);
+    };
+
+    loadData();
+  }, []);
 
   const addTask = (task: Omit<Task, 'id'>) => {
     setData(prev => ({

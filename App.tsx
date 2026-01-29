@@ -1,12 +1,15 @@
 import React from 'react';
 import { DataProvider } from './contexts/DataContext';
 import Layout from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const App = () => {
   return (
-    <DataProvider>
-      <Layout />
-    </DataProvider>
+    <ErrorBoundary>
+      <DataProvider>
+        <Layout />
+      </DataProvider>
+    </ErrorBoundary>
   );
 };
 

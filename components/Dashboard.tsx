@@ -1,35 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { useData } from '../contexts/DataContext';
-import { CheckCircle2, TrendingUp, DollarSign, BrainCircuit, Sparkles } from 'lucide-react';
+import { CheckCircle2, TrendingUp, DollarSign, BrainCircuit, Sparkles, AlertCircle } from 'lucide-react';
 import { generateLifeInsights } from '../services/geminiService';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { TaskCategory } from '../types';
+import { useIncomeStats } from '../services/useFinancialCalculations';
 
 const Dashboard = () => {
   const data = useData();
-  const [insight, setInsight] = useState<string>("Generatng insights...");
-  const [loading, setLoading] = useState(false);
+  const [insight, setInsight] = useState<string>("Generating insights...");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const incomeStats = useIncomeStats(data.transactions);
 
   useEffect(() => {
     // Initial load insight
     const loadInsight = async () => {
-        setLoading(true);
-        const txt = await generateLifeInsights(data);
-        setInsight(txt);
-        setLoading(false);
+        try {
+          setLoading(true);
+          setError(null);
+          const txt = await generateLifeInsights(data);
+          setInsight(txt);
+        } catch (err) {
+          console.error('Failed to generate insights:', err);
+          setError('Unable to generate AI insights at this time');
+          setInsight('Financial summary: Your app is ready to track your financial journey.');
+        } finally {
+          setLoading(false);
+        }
     };
     loadInsight();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
   const todayTasks = data.tasks.filter(t => t.isTodayFocus && !t.completed);
-  const completedToday = data.tasks.filter(t => t.completed).length; // Simplified for demo
-  const totalBalance = data.transactions.reduce((acc, curr) => curr.type === 'Income' ? acc + curr.amount : acc - curr.amount, 0);
+  const completedToday = data.tasks.filter(t => t.completed).length;
 
-  const taskStats = Object.values(TaskCategory).map(cat => ({
-    name: cat,
-    value: data.tasks.filter(t => t.category === cat && !t.completed).length
-  })).filter(i => i.value > 0);
+  const taskStats = Object.values(TaskCategory)
+    .map(cat => ({
+      name: cat,
+      value: data.tasks.filter(t => t.category === cat && !t.completed).length
+    }))
+    .filter(i => i.value > 0);
 
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#64748b'];
 
@@ -47,17 +59,26 @@ const Dashboard = () => {
       </header>
 
       {/* AI Insight */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+      <div className={`${error ? 'bg-amber-50 border border-amber-200' : 'bg-gradient-to-r from-indigo-600 to-purple-600'} ${error ? 'text-amber-900' : 'text-white'} p-6 rounded-2xl shadow-lg relative overflow-hidden`}>
         <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2 font-semibold text-indigo-100">
-                <BrainCircuit size={20} />
-                <span>Life OS Assistant</span>
+            <div className="flex items-center gap-2 mb-2 font-semibold">
+                {error ? (
+                  <>
+                    <AlertCircle size={20} />
+                    <span>Notice</span>
+                  </>
+                ) : (
+                  <>
+                    <BrainCircuit size={20} />
+                    <span>Life OS Assistant</span>
+                  </>
+                )}
             </div>
             <p className="text-lg leading-relaxed opacity-95">
                 {loading ? "Analyzing your second brain..." : insight}
             </p>
         </div>
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
+        {!error && <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
