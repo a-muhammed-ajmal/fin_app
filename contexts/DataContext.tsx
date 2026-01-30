@@ -65,98 +65,20 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'life-os-data-v1';
 
-const INITIAL_FINANCIAL_TOOLS: FinancialTool[] = [
-  // Basic
-  { id: '1', category: 'Identity', title: 'Aadhaar Card', status: 'Incomplete', isBasic: true, lastUpdated: new Date().toISOString(), fields: { 'Number': '', 'Status': 'Active', 'Linked to PAN': 'No' } },
-  { id: '2', category: 'Identity', title: 'PAN Card', status: 'Incomplete', isBasic: true, lastUpdated: new Date().toISOString(), fields: { 'Number': '', 'Linked to Bank': 'No' } },
-  { id: '3', category: 'Banking', title: '3-Account System', status: 'Incomplete', isBasic: true, lastUpdated: new Date().toISOString(), fields: { 'Income Acct Setup': 'No', 'Investment Acct Setup': 'No', 'Living Acct Setup': 'No' } },
-  { id: '4', category: 'Salary', title: 'EPF / UAN', status: 'Incomplete', isBasic: true, lastUpdated: new Date().toISOString(), fields: { 'UAN Number': '', 'KYC Verified': 'No', 'Nominee Added': 'No' } },
-  { id: '5', category: 'Safety', title: 'Document Vault', status: 'Incomplete', isBasic: true, lastUpdated: new Date().toISOString(), fields: { 'Physical Location': 'Home Shelf', 'Digital Backup': 'Google Drive' } },
-  // Advanced
-  { id: '6', category: 'Investment', title: 'Demat Account', status: 'Incomplete', isBasic: false, lastUpdated: new Date().toISOString(), fields: { 'Broker Name': '', 'Client ID': '', 'Nominee': '' } },
-  { id: '7', category: 'Credit', title: 'Credit Score', status: 'Incomplete', isBasic: false, lastUpdated: new Date().toISOString(), fields: { 'Last Score': '', 'Last Checked': '', 'Report Error Free': 'Yes' } },
-  { id: '8', category: 'Tax', title: 'Tax Portal', status: 'Incomplete', isBasic: false, lastUpdated: new Date().toISOString(), fields: { 'Login Active': 'No', 'Form 26AS Checked': 'No' } },
-  { id: '9', category: 'Legacy', title: 'Will & Testament', status: 'Incomplete', isBasic: false, lastUpdated: new Date().toISOString(), fields: { 'Drafted': 'No', 'Registered': 'No', 'Witnesses': '' } },
-];
+const INITIAL_FINANCIAL_TOOLS: FinancialTool[] = [];
 
 const INITIAL_DATA: AppData = {
-  tasks: [
-    { id: '1', title: 'Review Quarterly Goals', completed: false, category: TaskCategory.PROFESSIONAL, priority: Priority.P1, isTodayFocus: true },
-    { id: '2', title: 'Gym Workout', completed: false, category: TaskCategory.WELLNESS, priority: Priority.P2, isTodayFocus: true },
-    { id: '3', title: 'Pay Credit Card Bill', completed: false, category: TaskCategory.FINANCIAL, priority: Priority.P1, isTodayFocus: false },
-  ],
-  habits: [
-    { id: '1', title: 'Morning Meditation', streak: 5, history: {}, category: 'Wellness' },
-    { id: '2', title: 'Read 30 mins', streak: 12, history: {}, category: 'Personal' },
-  ],
-  transactions: [
-    { id: '1', amount: 5000, description: 'Monthly Salary', type: TransactionType.INCOME, category: 'Salary', esbiCategory: ESBICategory.EMPLOYEE, date: new Date().toISOString() },
-    { id: '2', amount: 150, description: 'Grocery Run', type: TransactionType.EXPENSE, category: 'Food', date: new Date().toISOString() },
-    { id: '3', amount: 1200, description: 'Rent', type: TransactionType.EXPENSE, category: 'Housing', date: new Date().toISOString() },
-  ],
+  tasks: [],
+  habits: [],
+  transactions: [],
+  transactionLogs: [],
   wishlist: [],
-  assets: [
-    { id: '1', name: 'Emergency Fund', value: 10000, type: 'Saving', target: 15000 },
-    { id: '2', name: 'S&P 500 ETF', value: 25000, type: 'Investment' },
-    { id: '3', name: 'Crypto Portfolio', value: 2000, type: 'Investment' },
-  ],
-  liabilities: [
-    { 
-        id: '1', 
-        name: 'Car Loan', 
-        totalAmount: 15000, 
-        paidAmount: 5000, 
-        monthlyPayment: 350,
-        interestRate: 8.5,
-        tenureMonths: 60,
-        startDate: new Date().toISOString(),
-        purpose: LoanPurpose.CONSUMPTION,
-        collateral: LoanCollateral.SECURED,
-        structure: LoanStructure.TERM,
-        calculationMethod: InterestCalculation.REDUCING,
-        rateType: InterestRateType.FIXED,
-        loanType: LoanType.CAR
-    },
-  ],
-  insurancePolicies: [
-    { 
-        id: '1', 
-        name: 'Optima Restore', 
-        type: InsuranceType.HEALTH,
-        insurer: 'HDFC Ergo',
-        policyNumber: '123456789',
-        premium: 400, 
-        sumAssured: 1000000, // 10L
-        tpaContact: '1800-102-0333',
-        renewalDate: '2024-12-31',
-        nominee: 'Spouse',
-        isCorporate: false
-    },
-    { 
-        id: '2', 
-        name: 'iTerm Plan', 
-        type: InsuranceType.TERM_LIFE,
-        insurer: 'Aegon Life',
-        policyNumber: 'TL-987654321',
-        premium: 500, 
-        sumAssured: 10000000, // 1Cr
-        renewalDate: '2025-06-15',
-        nominee: 'Spouse',
-        isCorporate: false
-    },
-  ],
-  investments: [
-    {
-      id: '1', name: 'Nifty 50 Index Fund', assetClass: AssetClass.EQUITY, amountInvested: 20000, currentValue: 25000, expectedReturn: 12, isSIP: true, monthlySIPAmount: 500
-    },
-    {
-      id: '2', name: 'Gold Bees', assetClass: AssetClass.COMMODITY, amountInvested: 5000, currentValue: 5500, expectedReturn: 8, isSIP: false
-    },
-    {
-      id: '3', name: 'Bank FD', assetClass: AssetClass.DEBT, amountInvested: 10000, currentValue: 10500, expectedReturn: 6, isSIP: false
-    }
-  ],
+  assets: [],
+  liabilities: [],
+  insurancePolicies: [],
+  investments: [],
   financialTools: INITIAL_FINANCIAL_TOOLS,
+  financialDocuments: [],
   savingsConfig: {
     monthlyExpense: 0,
     isJobStable: true,
@@ -166,13 +88,14 @@ const INITIAL_DATA: AppData = {
     isConfigured: false
   },
   incomeTarget: {
-    needs: 3000,
-    wants: 1000,
-    savings: 500,
-    insurance: 200,
-    investment: 1000,
-    taxBuffer: 1000,
+    needs: 0,
+    wants: 0,
+    savings: 0,
+    insurance: 0,
+    investment: 0,
+    taxBuffer: 0,
   },
+  incomeSources: [],
   incomeOpportunities: [],
   growthStrategy: {
     unfairAdvantage: "",
@@ -181,15 +104,10 @@ const INITIAL_DATA: AppData = {
     leverageAudit: [],
     geographyPlan: ""
   },
-  contacts: [
-    { id: '1', name: 'John Doe', company: 'Tech Corp', stage: LeadStage.CONTACTED, lastContacted: new Date().toISOString() },
-    { id: '2', name: 'Sarah Smith', company: 'Design Studio', stage: LeadStage.WON, dealValue: 12000, lastContacted: new Date().toISOString() },
-  ],
-  goals: [
-    { id: '1', title: 'Launch SaaS Product', horizon: '1 Year', progress: 45, isFinancial: false, tier: 'Freedom' },
-  ],
+  contacts: [],
+  goals: [],
   lifeGoals: [],
-  missionStatement: "To build meaningful technology and live a balanced, healthy life.",
+  missionStatement: "",
   riskProfile: undefined,
   taxProfile: {
       salary: 0,
