@@ -322,18 +322,116 @@ export interface RiskProfile {
   description: string;
 }
 
+// Episode 2: Income Engine - Detailed Structures
+export interface IncomeSource {
+  id: string;
+  name: string;
+  category: ESBICategory;
+  monthlyAmount: number;
+  isStable: boolean;
+  growthTarget?: number; // Target yearly growth %
+}
+
+export interface CashflowQuadrant {
+  employee: number;
+  selfEmployed: number;
+  business: number;
+  investor: number;
+}
+
+// Episode 12: Financial Planning - 3-Plan Framework
+export interface FinancialAudit {
+  monthlyIncome: number;
+  monthlyExpense: number; // Non-loan expenses
+  totalEMI: number;
+  currentInsurancePremium: number;
+  currentSavings: number;
+  currentInvestments: number;
+  totalLiabilities: number;
+  netWorth: number;
+  healthStatus: 'Green' | 'Yellow' | 'Red';
+  auditDate: string;
+}
+
+export interface FinancialPlan {
+  id: string;
+  planType: 'Today Safety' | 'Future Goals' | 'Lifestyle';
+  status: 'Green' | 'Yellow' | 'Red';
+  summary: string;
+  actionItems: string[];
+  targetDate?: string;
+  progressPercentage: number;
+}
+
+// Spending Engine - Detailed Budget Allocation
+export interface BudgetAllocation {
+  safetyPercentage: number; // Insurance + Emergency
+  growthPercentage: number; // Investment + SIPs
+  spendingPercentage: number; // Remaining for consumption
+  safetyAmount: number;
+  growthAmount: number;
+  spendingAmount: number;
+  monthlyIncome: number;
+}
+
+// Transaction for detailed tracking with all enrichments
+export interface TransactionLog {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+  type: TransactionType;
+  masterCategory: MasterCategory;
+  subCategory: string;
+  necessity?: Necessity;
+  relatedLoanId?: string;
+  linkedGoalId?: string;
+  tags: string[];
+  notes?: string;
+  receiptUrl?: string;
+}
+
+// Document Management for Financial Tools
+export interface FinancialDocument {
+  id: string;
+  category: FinancialToolCategory | 'Investment' | 'Loan';
+  documentType: string; // e.g., "Policy Document", "Loan Sanction Letter"
+  name: string;
+  linkedEntityId: string; // Links to Policy/Loan/Tool
+  uploadDate: string;
+  expiryDate?: string;
+  storageLocation: string; // URL or local path
+  status: 'Active' | 'Expired' | 'Archived';
+}
+
+// Financial Health Report
+export interface HealthReport {
+  generatedDate: string;
+  emiToIncomeRatio: number; // Should be < 40%
+  savingsRate: number; // % of income saved
+  investmentRate: number; // % of income invested
+  emergencyFundMonths: number; // Months covered
+  debtToAssetRatio: number;
+  netWorthTrend: number; // % change from last month
+  recommendations: string[];
+  redFlags: string[];
+}
+
 export interface AppData {
   tasks: Task[];
   habits: Habit[];
   transactions: Transaction[];
+  transactionLogs: TransactionLog[]; // Enhanced transaction tracking
   wishlist: WishlistItem[];
   assets: FinancialAsset[];
   liabilities: Liability[];
   insurancePolicies: InsurancePolicy[];
   investments: Investment[]; 
   financialTools: FinancialTool[];
+  financialDocuments: FinancialDocument[];
   savingsConfig: SavingsConfig;
   incomeTarget: IncomeTarget;
+  incomeSources: IncomeSource[];
   incomeOpportunities: IncomeOpportunity[];
   growthStrategy: GrowthStrategy;
   contacts: Contact[];
@@ -342,4 +440,8 @@ export interface AppData {
   missionStatement: string;
   riskProfile?: RiskProfile;
   taxProfile: TaxProfile;
+  budgetAllocation?: BudgetAllocation;
+  financialAudit?: FinancialAudit;
+  financialPlans: FinancialPlan[];
+  healthReport?: HealthReport;
 }

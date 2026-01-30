@@ -17,6 +17,10 @@ import InsuranceManager from './InsuranceManager';
 import InvestmentManager from './InvestmentManager';
 import TaxManager from './TaxManager';
 import FinancialPlan from './FinancialPlan';
+import CashFlowTracker from './CashFlowTracker';
+import EnhancedSpendingEngine from './EnhancedSpendingEngine';
+import FinancialMasterPlan from './FinancialMasterPlan';
+import FinancialDocuments from './FinancialDocuments';
 
 const FinanceManager = () => {
   const { 
@@ -181,13 +185,13 @@ const FinanceManager = () => {
         </div>
 
         {/* --- FINANCIAL MASTER PLAN (New) --- */}
-        {activeTab === 'plan' && <FinancialPlan />}
+        {activeTab === 'plan' && <FinancialMasterPlan />}
 
         {/* --- INCOME ENGINE TAB --- */}
         {activeTab === 'income' && <IncomeEngine />}
         
         {/* --- SPENDING ENGINE TAB --- */}
-        {activeTab === 'spending' && <SpendingEngine />}
+        {activeTab === 'spending' && <EnhancedSpendingEngine />}
 
         {/* --- SAVINGS ENGINE TAB --- */}
         {activeTab === 'savings' && <SavingsEngine />}
@@ -199,125 +203,7 @@ const FinanceManager = () => {
         {activeTab === 'tools' && <FinancialTools />}
 
         {/* --- CASH FLOW TAB --- */}
-        {activeTab === 'cashflow' && (
-            <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 relative overflow-hidden group">
-                        <Wallet className="absolute right-4 top-4 text-emerald-200 opacity-50 group-hover:scale-110 transition" size={48} />
-                        <h3 className="font-bold text-emerald-800 mb-1">Income</h3>
-                        <p className="text-xs text-emerald-600 mb-2">Strategy: Earn & Grow</p>
-                        <div className="text-2xl font-bold text-emerald-900">${totalIncome.toLocaleString()}</div>
-                    </div>
-                    <div className="bg-rose-50 p-6 rounded-xl border border-rose-100 relative overflow-hidden group">
-                        <Banknote className="absolute right-4 top-4 text-rose-200 opacity-50 group-hover:scale-110 transition" size={48} />
-                        <h3 className="font-bold text-rose-800 mb-1">Spending</h3>
-                        <p className="text-xs text-rose-600 mb-2">Strategy: Strict Means</p>
-                        <div className="text-2xl font-bold text-rose-900">${totalExpense.toLocaleString()}</div>
-                    </div>
-                    <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 relative overflow-hidden group">
-                        <Building className="absolute right-4 top-4 text-amber-200 opacity-50 group-hover:scale-110 transition" size={48} />
-                        <h3 className="font-bold text-amber-800 mb-1">Tax</h3>
-                        <p className="text-xs text-amber-600 mb-2">Strategy: Plan & Manage</p>
-                        <div className="text-2xl font-bold text-amber-900">${totalTax.toLocaleString()}</div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Add Transaction */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit">
-                        <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <Plus size={16} className="text-indigo-600" /> Log Transaction
-                        </h3>
-                        <form onSubmit={handleAddTransaction} className="space-y-3">
-                            <div className="flex gap-2">
-                                <select 
-                                    className="w-1/3 text-sm border border-slate-200 rounded p-2 bg-slate-50"
-                                    value={txType}
-                                    onChange={(e) => setTxType(e.target.value as TransactionType)}
-                                >
-                                    <option value={TransactionType.INCOME}>Income</option>
-                                    <option value={TransactionType.EXPENSE}>Expense</option>
-                                </select>
-                                <input 
-                                    type="number" placeholder="Amount" 
-                                    className="w-2/3 border border-slate-200 rounded p-2 text-sm"
-                                    value={txAmount} onChange={(e) => setTxAmount(e.target.value)}
-                                />
-                            </div>
-                            
-                            {/* ESBI Selector if Income */}
-                            {txType === TransactionType.INCOME && (
-                                <select 
-                                    className="w-full text-sm border border-slate-200 rounded p-2 bg-indigo-50 text-indigo-800"
-                                    value={esbiType}
-                                    onChange={(e) => setEsbiType(e.target.value as ESBICategory)}
-                                >
-                                    {Object.values(ESBICategory).map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            )}
-
-                            <input 
-                                type="text" placeholder="Description" 
-                                className="w-full border border-slate-200 rounded p-2 text-sm"
-                                value={txDesc} onChange={(e) => setTxDesc(e.target.value)}
-                            />
-                            <div className="flex gap-2">
-                                <input 
-                                    type="text" placeholder="Category (e.g., Food, Tax, Salary)" 
-                                    className="w-full border border-slate-200 rounded p-2 text-sm"
-                                    value={txCategory} onChange={(e) => setTxCategory(e.target.value)}
-                                />
-                            </div>
-                            <button type="submit" className="w-full bg-slate-800 text-white py-2 rounded text-sm font-medium hover:bg-slate-900">
-                                Add Entry
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Chart */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
-                        <h3 className="font-bold text-slate-800 mb-4">Cash Flow Trends</h3>
-                        <div className="h-64">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={monthlyData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis dataKey="name" fontSize={12} />
-                                    <Tooltip />
-                                    <Bar dataKey="Income" fill="#10b981" radius={[4, 4, 0, 0]} name="Income" />
-                                    <Bar dataKey="Expense" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expense" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Recent Logs */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 font-bold text-slate-700 bg-slate-50">Recent Activity</div>
-                    <div className="max-h-60 overflow-y-auto divide-y divide-slate-100">
-                        {transactions.slice(0, 10).map(t => (
-                            <div key={t.id} className="flex justify-between items-center p-3 text-sm hover:bg-slate-50">
-                                <div>
-                                    <div className="font-medium text-slate-800">{t.description}</div>
-                                    <div className="text-xs text-slate-500 flex gap-2">
-                                        <span>{new Date(t.date).toLocaleDateString()}</span>
-                                        <span className={`px-1.5 rounded-full text-[10px] ${t.category === 'Tax' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100'}`}>{t.category}</span>
-                                        {t.esbiCategory && (
-                                            <span className="bg-indigo-100 text-indigo-700 px-1.5 rounded-full text-[10px]">{t.esbiCategory}</span>
-                                        )}
-                                    </div>
-                                </div>
-                                <span className={`font-bold ${t.type === TransactionType.INCOME ? 'text-emerald-600' : t.category === 'Tax' ? 'text-amber-600' : 'text-slate-600'}`}>
-                                    {t.type === TransactionType.INCOME ? '+' : '-'}${t.amount.toLocaleString()}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        )}
+        {activeTab === 'cashflow' && <CashFlowTracker />}
 
         {/* --- WEALTH TAB (Simple View) --- */}
         {activeTab === 'balance' && (

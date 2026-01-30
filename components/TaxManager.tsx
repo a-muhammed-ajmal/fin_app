@@ -353,7 +353,7 @@ const TaxManager = () => {
                       <div className="space-y-3 text-sm">
                           <div className="flex gap-3">
                               <div className="font-bold text-indigo-600 w-12">ITR-1</div>
-                              <div className="text-slate-600">Salaried + 1 House Property + Interest Income (< 50L).</div>
+                              <div className="text-slate-600">Salaried + 1 House Property + Interest Income (Less than 50L).</div>
                           </div>
                           <div className="flex gap-3">
                               <div className="font-bold text-indigo-600 w-12">ITR-2</div>
