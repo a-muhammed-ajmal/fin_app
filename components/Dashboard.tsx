@@ -43,6 +43,11 @@ const Dashboard = () => {
     }))
     .filter(i => i.value > 0);
 
+  // Calculate total balance from assets and liabilities
+  const totalAssets = data.assets.reduce((sum, asset) => sum + (asset.value || 0), 0);
+  const totalLiabilities = data.liabilities.reduce((sum, liability) => sum + (liability.amount || 0), 0);
+  const totalBalance = totalAssets - totalLiabilities;
+
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#64748b'];
 
   return (
